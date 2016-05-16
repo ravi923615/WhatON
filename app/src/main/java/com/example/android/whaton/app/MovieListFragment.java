@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +51,29 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         getPopularMovie movielis = new getPopularMovie();
         movielis.execute();
         return rootView;
+    }
+
+    private String[] getPopularMovieDataFromJSON(String popularMovieJSONStr)
+            throws JSONException {
+
+        JSONObject popularMovieJSON = new JSONObject(popularMovieJSONStr);
+        JSONArray PopularmovieArray = popularMovieJSON.getJSONArray("results");
+        String[] resultimages = new String[20];
+
+        for(int i=0;i<PopularmovieArray.length();i++){
+            String image;
+
+            JSONObject results = PopularmovieArray.getJSONObject(i);
+            image = results.getString("poster_path");
+
+            resultimages[i] = image;
+
+        }
+        for(String s:resultimages) {
+            Log.v("Get out", s);
+        }
+        return resultimages;
+
     }
 
     public class getPopularMovie extends AsyncTask<Void,Void,Void>{
@@ -88,14 +115,15 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                 if(stringBuffer==null)
                     return null;
                 popularMovieJSON = stringBuffer.toString();
-
-                Log.v("sdf",popularMovieJSON);
+                getJSONMovieStr = getPopularMovieDataFromJSON(popularMovieJSON);
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
                 if(urlConnection!=null){
                     urlConnection.disconnect();
                 }
