@@ -1,5 +1,7 @@
 package com.example.android.whaton.app;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,15 +22,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieListFragment extends android.support.v4.app.Fragment {
     CustomMovieAdapter customMovieAdapter;
-    CustomMovie[] customMovies = {new CustomMovie(R.drawable.cupcake),
-                                  new CustomMovie(R.drawable.froyo),
-                                  new CustomMovie(R.drawable.kitkat),
-                                  new CustomMovie(R.drawable.lollipop)};
+  //  CustomMovie[] customMovies = {new CustomMovie(R.drawable.cupcake),
+    //                              new CustomMovie(R.drawable.froyo),
+      //                            new CustomMovie(R.drawable.kitkat),
+        //                          new CustomMovie(R.drawable.lollipop)};
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getMovieDetailList();
+    }
+
     public MovieListFragment() {
+    }
+
+    public void getMovieDetailList(){
+        getPopularMovie popularMovie = new getPopularMovie();
+        popularMovie.execute();
     }
 
     @Override
@@ -41,46 +56,67 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
 
        // mMovieAdapter = new ArrayAdapter<String>(getActivity(),R.layout.list_movie_text,R.id.list_movie_text_view,mMovieList);
 
-        customMovieAdapter = new CustomMovieAdapter(getActivity(),Arrays.asList(customMovies));
+
+        customMovieAdapter = new CustomMovieAdapter(getActivity(),new ArrayList<CustomMovie>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_movies);
         listView.setAdapter(customMovieAdapter);
 
-        getPopularMovie movielis = new getPopularMovie();
-        movielis.execute();
+
         return rootView;
     }
 
-    private String[] getPopularMovieDataFromJSON(String popularMovieJSONStr)
-            throws JSONException {
+    public class getPopularMovie extends AsyncTask<Void, Void, List<CustomMovie>> {
 
-        JSONObject popularMovieJSON = new JSONObject(popularMovieJSONStr);
-        JSONArray PopularmovieArray = popularMovieJSON.getJSONArray("results");
-        String[] resultimages = new String[20];
+        private Bitmap getDrawableFromURL(String url) throws IOException, MalformedURLException {
+            Bitmap img;
 
-        for(int i=0;i<PopularmovieArray.length();i++){
-            String image;
+            HttpURLConnection getURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            getURLConnection.setRequestProperty("User-agent","Mozilla/4.0");
 
-            JSONObject results = PopularmovieArray.getJSONObject(i);
-            image = results.getString("poster_path");
+            getURLConnection.connect();
 
-            resultimages[i] = image;
+            InputStream inputStream = getURLConnection.getInputStream();
+
+            img = BitmapFactory.decodeStream(inputStream);
+
+            if(getURLConnection!=null){
+                getURLConnection.disconnect();
+            }
+
+            return img;
+        }
+
+        private String[] getPopularMovieDataFromJSON(String popularMovieJSONStr)
+                throws JSONException {
+
+            JSONObject popularMovieJSON = new JSONObject(popularMovieJSONStr);
+            JSONArray PopularmovieArray = popularMovieJSON.getJSONArray("results");
+            String[] resultimages = new String[20];
+
+            for(int i=0;i<PopularmovieArray.length();i++){
+                String image;
+
+                JSONObject results = PopularmovieArray.getJSONObject(i);
+                image = results.getString("poster_path");
+
+                resultimages[i] = image;
+
+            }
+            for(String s:resultimages) {
+                Log.v("Get out", s);
+            }
+            return resultimages;
 
         }
-        for(String s:resultimages) {
-            Log.v("Get out", s);
-        }
-        return resultimages;
 
-    }
-
-    public class getPopularMovie extends AsyncTask<Void,Void,Void>{
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<CustomMovie> doInBackground(Void... voids) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
+            List<CustomMovie> customMovies = null;
 
 
 
@@ -116,6 +152,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                     return null;
                 popularMovieJSON = stringBuffer.toString();
                 getJSONMovieStr = getPopularMovieDataFromJSON(popularMovieJSON);
+                for(String ur:getJSONMovieStr){
+                    String fullurl = "https://image.tmdb.org/t/p/w396"+ur;
+                    Log.v("Check",fullurl);
+                  Bitmap getDrawImage = getDrawableFromURL(fullurl);
+                    customMovies = new ArrayList<CustomMovie>();
+                    customMovies.add(new CustomMovie(getDrawImage));
+                }
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -135,9 +178,18 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                     }
                 }
             }
+            return customMovies;
+        }
 
-
-            return null;
+        @Override
+        protected void onPostExecute(List<CustomMovie> customMovies) {
+            if(customMovies!=null){
+                customMovieAdapter.clear();
+                for(CustomMovie lst:customMovies){
+                    customMovieAdapter.add(lst);
+                }
+            }
         }
     }
+
 }

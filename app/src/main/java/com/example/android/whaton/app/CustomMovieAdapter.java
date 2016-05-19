@@ -47,7 +47,7 @@ public class CustomMovieAdapter extends ArrayAdapter<CustomMovie> {
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.list_item_icon);
-        iconView.setImageResource(customMovie.image);
+        iconView.setImageBitmap(customMovie.image);
 
         return convertView;
     }
