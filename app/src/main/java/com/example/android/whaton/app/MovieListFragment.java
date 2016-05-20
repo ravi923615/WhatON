@@ -116,7 +116,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         protected List<CustomMovie> doInBackground(Void... voids) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            List<CustomMovie> customMovies = null;
+            List<CustomMovie> customMovies = customMovies = new ArrayList<CustomMovie>();;
 
 
 
@@ -156,7 +156,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                     String fullurl = "https://image.tmdb.org/t/p/w396"+ur;
                     Log.v("Check",fullurl);
                   Bitmap getDrawImage = getDrawableFromURL(fullurl);
-                    customMovies = new ArrayList<CustomMovie>();
                     customMovies.add(new CustomMovie(getDrawImage));
                 }
 
@@ -178,6 +177,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                     }
                 }
             }
+            Log.v("size", String.valueOf(customMovies.size()));
             return customMovies;
         }
 
