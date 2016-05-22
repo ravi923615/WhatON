@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -61,8 +62,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_movies);
-        listView.setAdapter(customMovieAdapter);
+        GridView gridView = (GridView) rootView.findViewById(R.id.listview_movies);
+        gridView.setAdapter(customMovieAdapter);
 
 
         return rootView;
