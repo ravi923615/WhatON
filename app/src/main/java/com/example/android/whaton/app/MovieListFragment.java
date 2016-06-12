@@ -1,14 +1,17 @@
 package com.example.android.whaton.app;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 
@@ -51,12 +54,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-       // String[] list = {"Ravi","Kumar","Sharma"};
-
-       // List<String> mMovieList = new ArrayList<String>(Arrays.asList(list));
-
-       // mMovieAdapter = new ArrayAdapter<String>(getActivity(),R.layout.list_movie_text,R.id.list_movie_text_view,mMovieList);
-
 
         customMovieAdapter = new CustomMovieAdapter(getActivity(),new ArrayList<CustomMovie>());
 
@@ -65,6 +62,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         GridView gridView = (GridView) rootView.findViewById(R.id.listview_movies);
         gridView.setAdapter(customMovieAdapter);
 
+        gridView.setOnClickListener(new AdapterView.OnItemClickListener(){});
 
         return rootView;
     }
@@ -130,8 +128,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                 String popularMovieJSON;
                 String[] getJSONMovieStr = new String[0];
 
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String sorttype = sharedPreferences.getString(getString(R.string.pref_sortby_key),getString(R.string.pref_by_popularity));
+                Log.v("Sorty by: ",sorttype);
+
                 Uri builtUri = Uri.parse(PopularMovie).buildUpon()
-                        .appendQueryParameter(Query,"popularity.desc")
+                        .appendQueryParameter(Query,sorttype)
                         .appendQueryParameter(APIKey,"c5d20681e625f796b7fd405a697a2e91")
                         .build();
                 URL url = new URL(builtUri.toString());
@@ -154,10 +156,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                 popularMovieJSON = stringBuffer.toString();
                 getJSONMovieStr = getPopularMovieDataFromJSON(popularMovieJSON);
                 for(String ur:getJSONMovieStr){
-                    String fullurl = "https://image.tmdb.org/t/p/w396"+ur;
-                    Log.v("Check",fullurl);
-                  Bitmap getDrawImage = getDrawableFromURL(fullurl);
-                    customMovies.add(new CustomMovie(getDrawImage));
+                    if(!ur.equals("null")) {
+                        String fullurl = "https://image.tmdb.org/t/p/w396" + ur;
+                        Log.v("Check", fullurl);
+                        Bitmap getDrawImage = getDrawableFromURL(fullurl);
+                        customMovies.add(new CustomMovie(getDrawImage));
+                    }
                 }
 
             } catch (MalformedURLException e) {
