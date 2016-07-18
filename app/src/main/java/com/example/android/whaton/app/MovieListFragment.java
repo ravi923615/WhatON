@@ -1,5 +1,7 @@
 package com.example.android.whaton.app;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +66,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         GridView gridView = (GridView) rootView.findViewById(R.id.listview_movies);
         gridView.setAdapter(customMovieAdapter);
 
-        gridView.setOnClickListener(new AdapterView.OnItemClickListener(){});
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent frag = new Intent(getActivity(),MovieDetailFragment.class);
+                startActivity(frag);
+            }
+        });
 
         return rootView;
     }
@@ -159,8 +169,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                     if(!ur.equals("null")) {
                         String fullurl = "https://image.tmdb.org/t/p/w396" + ur;
                         Log.v("Check", fullurl);
-                        Bitmap getDrawImage = getDrawableFromURL(fullurl);
-                        customMovies.add(new CustomMovie(getDrawImage));
+                        //Bitmap getImage = Picasso.with(getActivity()).load(fullurl).fit().get();
+                        customMovies.add(new CustomMovie(fullurl));
                     }
                 }
 

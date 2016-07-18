@@ -1,11 +1,14 @@
 package com.example.android.whaton.app;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -47,7 +50,7 @@ public class CustomMovieAdapter extends ArrayAdapter<CustomMovie> {
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.list_item_icon);
-        iconView.setImageBitmap(customMovie.image);
+        Picasso.with(getContext()).load(customMovie.imageUrl).into(iconView);
 
         return convertView;
     }
