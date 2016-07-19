@@ -69,7 +69,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent frag = new Intent(getActivity(),MovieDetailFragment.class);
+                Intent frag = new Intent(getActivity(),MovieDetailActivity.class);
                 startActivity(frag);
             }
         });

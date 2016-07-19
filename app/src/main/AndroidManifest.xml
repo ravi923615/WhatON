@@ -27,6 +27,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.whaton.app.MainActivity" />
         </activity>
+        <activity android:name=".MovieDetailActivity"></activity>
     </application>
 
 </manifest>
